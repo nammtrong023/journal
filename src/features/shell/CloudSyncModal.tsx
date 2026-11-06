@@ -69,7 +69,7 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
         setAnonKey(config.anonKey)
         setConnected(true)
       } else {
-        setUrl('https://zcmknxpffyrhwmiioboy.supabase.co')
+        setUrl('https://envtnwnleyccdxutiysa.supabase.co')
         setAnonKey('')
         setConnected(false)
       }
