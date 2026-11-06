@@ -16,9 +16,16 @@ let cachedKey = ''
  * Returns current Supabase config from Vite env vars or localStorage.
  */
 export function getSupabaseConfig(): SupabaseConfig | null {
-  // 1. Try env vars first (e.g. injected in Vercel or local .env)
-  const envUrl = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_SUPABASE_URL : undefined
-  const envKey = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_SUPABASE_ANON_KEY : undefined
+  // 1. Try env vars first (supports Vite, Vercel Supabase integration & Next.js presets)
+  const metaEnv = typeof import.meta !== 'undefined' ? (import.meta.env as Record<string, string | undefined>) : undefined
+  const envUrl =
+    metaEnv?.VITE_SUPABASE_URL ||
+    metaEnv?.SUPABASE_URL ||
+    metaEnv?.NEXT_PUBLIC_SUPABASE_URL
+  const envKey =
+    metaEnv?.VITE_SUPABASE_ANON_KEY ||
+    metaEnv?.SUPABASE_ANON_KEY ||
+    metaEnv?.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (envUrl && envKey) {
     return { url: envUrl.trim(), anonKey: envKey.trim() }
