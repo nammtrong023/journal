@@ -68,6 +68,57 @@ export function normalizeTrade(raw: Trade): Trade {
   }
 }
 
+const DELETED_TRADES_STORAGE_KEY = 'journal_deleted_trade_ids'
+const inMemoryDeletedIds = new Set<string>()
+
+export function getDeletedTradeIds(): Set<string> {
+  const result = new Set(inMemoryDeletedIds)
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const raw = localStorage.getItem(DELETED_TRADES_STORAGE_KEY)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+          for (const id of parsed) {
+            result.add(id)
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return result
+}
+
+export function markTradeAsDeleted(id: string): void {
+  inMemoryDeletedIds.add(id)
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const ids = Array.from(getDeletedTradeIds())
+      if (!ids.includes(id)) {
+        ids.push(id)
+      }
+      const trimmed = ids.slice(-2000)
+      localStorage.setItem(DELETED_TRADES_STORAGE_KEY, JSON.stringify(trimmed))
+    } catch {
+      // ignore
+    }
+  }
+}
+
+export function unmarkTradeAsDeleted(id: string): void {
+  inMemoryDeletedIds.delete(id)
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const ids = Array.from(getDeletedTradeIds()).filter((x) => x !== id)
+      localStorage.setItem(DELETED_TRADES_STORAGE_KEY, JSON.stringify(ids))
+    } catch {
+      // ignore
+    }
+  }
+}
+
 const REMOTE_REFRESH_MIN_INTERVAL_MS = 15_000
 
 export class TradeRepository {
@@ -83,8 +134,10 @@ export class TradeRepository {
     validateTradeDate(input.tradeDate)
 
     const now = new Date().toISOString()
+    const tradeId = input.id || crypto.randomUUID()
+    unmarkTradeAsDeleted(tradeId)
     const trade: Trade = {
-      id: input.id || crypto.randomUUID(),
+      id: tradeId,
       tradeDate: input.tradeDate,
       templateVersion: TEMPLATE_VERSION,
       ticker: input.ticker || '',
@@ -152,6 +205,10 @@ export class TradeRepository {
   }
 
   async get(id: string): Promise<Trade | undefined> {
+    if (getDeletedTradeIds().has(id)) {
+      return undefined
+    }
+
     const local = await this.db.trades.get(id)
     if (local) {
       return normalizeTrade(local)
@@ -214,8 +271,10 @@ export class TradeRepository {
           .order('createdAt', { ascending: true })
         if (error || !data || !Array.isArray(data)) return
 
+        const deletedIds = getDeletedTradeIds()
         const local = new Map((await this.db.trades.toArray()).map((t) => [t.id, t.updatedAt]))
         const stale = (data as Trade[]).filter((r) => {
+          if (deletedIds.has(r.id)) return false
           const localUpdatedAt = local.get(r.id)
           return localUpdatedAt === undefined || (r.updatedAt ?? '') > localUpdatedAt
         })
@@ -236,6 +295,8 @@ export class TradeRepository {
   }
 
   async delete(id: string): Promise<void> {
+    markTradeAsDeleted(id)
+
     const existing = await this.db.trades.get(id)
     const imageIds = existing?.slides?.map((s) => s.imageId).filter(Boolean) as string[] | undefined
 
@@ -247,10 +308,21 @@ export class TradeRepository {
     // Remove from Supabase if configured
     const supabase = getSupabaseClient()
     if (supabase) {
-      void supabase.from('trades').delete().eq('id', id)
+      try {
+        const { error } = await supabase.from('trades').delete().eq('id', id)
+        if (error) {
+          console.error('Supabase trade delete error:', error)
+        }
+      } catch (err) {
+        console.error('Supabase trade delete exception:', err)
+      }
       if (imageIds && imageIds.length > 0) {
         const filePaths = imageIds.map((imgId) => `${imgId}.png`)
-        void supabase.storage.from('trade-images').remove(filePaths)
+        try {
+          await supabase.storage.from('trade-images').remove(filePaths)
+        } catch (err) {
+          console.warn('Supabase images delete exception:', err)
+        }
       }
     }
   }
@@ -342,10 +414,15 @@ export class TradeRepository {
     }
 
     if (data && Array.isArray(data)) {
+      const deletedIds = getDeletedTradeIds()
+      let pulledTrades = 0
       for (const item of data) {
-        await this.db.trades.put(normalizeTrade(item as Trade)).catch(() => {})
+        if (!deletedIds.has(item.id)) {
+          await this.db.trades.put(normalizeTrade(item as Trade)).catch(() => {})
+          pulledTrades++
+        }
       }
-      return { pulledTrades: data.length }
+      return { pulledTrades }
     }
 
     return { pulledTrades: 0 }
