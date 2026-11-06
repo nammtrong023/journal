@@ -38,8 +38,17 @@ export function DayDashboardPage({ repository = defaultRepository }: DayDashboar
       }
     })
 
+    // Silent refresh when background sync pulls newer remote trades
+    const refresh = () => {
+      repository.listByDate(dateParam).then((result) => {
+        if (!isCancelled) setTrades(result)
+      }).catch(() => {})
+    }
+    window.addEventListener('trades-changed', refresh)
+
     return () => {
       isCancelled = true
+      window.removeEventListener('trades-changed', refresh)
     }
   }, [dateParam, repository])
 

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AppShell } from './features/shell/AppShell'
+import { PageErrorBoundary } from './features/shell/PageErrorBoundary'
 
 const CalendarPage = lazy(() => import('./features/calendar/CalendarPage').then(m => ({ default: m.CalendarPage })))
 const DayDashboardPage = lazy(() => import('./features/day-dashboard/DayDashboardPage').then(m => ({ default: m.DayDashboardPage })))
@@ -17,20 +18,23 @@ function PageFallback() {
 }
 
 export function App() {
+  const { pathname } = useLocation()
   return (
     <AppShell>
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/calendar" replace />} />
-          <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/dashboard" element={<DayDashboardPage />} />
-          <Route path="/stats" element={<StatsPage />} />
-          <Route path="/calculator" element={<CalculatorPage />} />
-          <Route path="/trades/new" element={<TradeEditor />} />
-          <Route path="/trades/:tradeId" element={<TradeEditor />} />
-          <Route path="*" element={<Navigate to="/calendar" replace />} />
-        </Routes>
-      </Suspense>
+      <PageErrorBoundary resetKey={pathname}>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/calendar" replace />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/dashboard" element={<DayDashboardPage />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/calculator" element={<CalculatorPage />} />
+            <Route path="/trades/new" element={<TradeEditor />} />
+            <Route path="/trades/:tradeId" element={<TradeEditor />} />
+            <Route path="*" element={<Navigate to="/calendar" replace />} />
+          </Routes>
+        </Suspense>
+      </PageErrorBoundary>
     </AppShell>
   )
 }

@@ -49,8 +49,31 @@ function cleanTradeForSupabase(trade: Trade) {
   }
 }
 
+/**
+ * Supabase returns SQL NULL for unset columns, but the app models them as `undefined`
+ * (UI code does `trade.result !== undefined && trade.result.toFixed(...)`). Normalise
+ * every trade that crosses the storage boundary so a NULL can never reach a component.
+ */
+export function normalizeTrade(raw: Trade): Trade {
+  const t = raw as unknown as Record<string, unknown>
+  return {
+    ...raw,
+    side: (t.side ?? '') as Trade['side'],
+    session: (t.session ?? '') as string,
+    ticker: (t.ticker ?? '') as string,
+    result: (t.result ?? undefined) as number | undefined,
+    rMultiple: (t.rMultiple ?? undefined) as number | undefined,
+    emotions: (t.emotions ?? undefined) as string[] | undefined,
+    slides: Array.isArray(t.slides) ? (t.slides as Trade['slides']) : [],
+  }
+}
+
+const REMOTE_REFRESH_MIN_INTERVAL_MS = 15_000
+
 export class TradeRepository {
   private db: JournalDatabase
+  private refreshInFlight: Promise<void> | null = null
+  private lastRefreshAt = 0
 
   constructor(dbName = 'local-trading-journal') {
     this.db = new JournalDatabase(dbName)
@@ -131,7 +154,7 @@ export class TradeRepository {
   async get(id: string): Promise<Trade | undefined> {
     const local = await this.db.trades.get(id)
     if (local) {
-      return local
+      return normalizeTrade(local)
     }
 
     const supabase = getSupabaseClient()
@@ -144,7 +167,7 @@ export class TradeRepository {
           .maybeSingle()
 
         if (!error && data) {
-          const trade = data as Trade
+          const trade = normalizeTrade(data as Trade)
           await this.db.trades.put(trade).catch(() => {})
           return trade
         }
@@ -157,51 +180,59 @@ export class TradeRepository {
   }
 
   async listByDate(date: string): Promise<Trade[]> {
-    const supabase = getSupabaseClient()
-    if (supabase) {
-      try {
-        const { data, error } = await supabase
-          .from('trades')
-          .select('*')
-          .eq('tradeDate', date)
-          .order('createdAt', { ascending: true })
-
-        if (!error && data && Array.isArray(data)) {
-          for (const item of data) {
-            await this.db.trades.put(item as Trade).catch(() => {})
-          }
-        }
-      } catch (err) {
-        console.warn('Supabase listByDate fetch failed:', err)
-      }
-    }
-
-    return this.db.trades
+    // Local-first: never block on the network. Remote changes arrive via 'trades-changed'.
+    void this.refreshFromRemote()
+    const rows = await this.db.trades
       .where('tradeDate')
       .equals(date)
       .sortBy('createdAt')
+    return rows.map(normalizeTrade)
   }
 
   async listAll(): Promise<Trade[]> {
+    void this.refreshFromRemote()
+    return (await this.db.trades.toArray()).map(normalizeTrade)
+  }
+
+  /**
+   * Stale-while-revalidate: pulls remote trades in the background (deduped + throttled),
+   * writes only rows newer than local, and emits 'trades-changed' only if something changed.
+   */
+  refreshFromRemote(force = false): Promise<void> {
+    if (this.refreshInFlight) return this.refreshInFlight
+    if (!force && Date.now() - this.lastRefreshAt < REMOTE_REFRESH_MIN_INTERVAL_MS) {
+      return Promise.resolve()
+    }
     const supabase = getSupabaseClient()
-    if (supabase) {
+    if (!supabase) return Promise.resolve()
+
+    this.refreshInFlight = (async () => {
       try {
         const { data, error } = await supabase
           .from('trades')
           .select('*')
           .order('createdAt', { ascending: true })
+        if (error || !data || !Array.isArray(data)) return
 
-        if (!error && data && Array.isArray(data)) {
-          for (const item of data) {
-            await this.db.trades.put(item as Trade).catch(() => {})
+        const local = new Map((await this.db.trades.toArray()).map((t) => [t.id, t.updatedAt]))
+        const stale = (data as Trade[]).filter((r) => {
+          const localUpdatedAt = local.get(r.id)
+          return localUpdatedAt === undefined || (r.updatedAt ?? '') > localUpdatedAt
+        })
+        if (stale.length > 0) {
+          await this.db.trades.bulkPut(stale.map(normalizeTrade))
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('trades-changed'))
           }
         }
+        this.lastRefreshAt = Date.now()
       } catch (err) {
-        console.warn('Supabase listAll fetch failed:', err)
+        console.warn('Supabase background refresh failed:', err)
+      } finally {
+        this.refreshInFlight = null
       }
-    }
-
-    return this.db.trades.toArray()
+    })()
+    return this.refreshInFlight
   }
 
   async delete(id: string): Promise<void> {
@@ -312,7 +343,7 @@ export class TradeRepository {
 
     if (data && Array.isArray(data)) {
       for (const item of data) {
-        await this.db.trades.put(item as Trade).catch(() => {})
+        await this.db.trades.put(normalizeTrade(item as Trade)).catch(() => {})
       }
       return { pulledTrades: data.length }
     }

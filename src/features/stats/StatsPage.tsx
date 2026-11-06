@@ -175,6 +175,15 @@ export function StatsPage({ repository = defaultRepository }: { repository?: Sta
     void load()
   }, [load])
 
+  // Silent refresh when background sync pulls newer remote trades
+  useEffect(() => {
+    const refresh = () => {
+      repository.listAll().then(setTrades).catch(() => {})
+    }
+    window.addEventListener('trades-changed', refresh)
+    return () => window.removeEventListener('trades-changed', refresh)
+  }, [repository])
+
   const snapshot = useMemo(
     () => (trades ? buildStatsSnapshot(trades, range) : null),
     [trades, range],
