@@ -54,6 +54,7 @@ export function saveSupabaseConfig(url: string, anonKey: string): void {
   if (typeof window !== 'undefined' && window.localStorage) {
     localStorage.setItem(SUPABASE_STORAGE_URL_KEY, url.trim())
     localStorage.setItem(SUPABASE_STORAGE_ANON_KEY, anonKey.trim())
+    window.dispatchEvent(new Event('supabase-config-changed'))
   }
   cachedClient = null
 }
@@ -65,6 +66,7 @@ export function clearSupabaseConfig(): void {
   if (typeof window !== 'undefined' && window.localStorage) {
     localStorage.removeItem(SUPABASE_STORAGE_URL_KEY)
     localStorage.removeItem(SUPABASE_STORAGE_ANON_KEY)
+    window.dispatchEvent(new Event('supabase-config-changed'))
   }
   cachedClient = null
 }

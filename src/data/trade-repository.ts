@@ -32,6 +32,23 @@ export function validateTradeDate(tradeDate: string): void {
   }
 }
 
+function cleanTradeForSupabase(trade: Trade) {
+  return {
+    id: trade.id,
+    tradeDate: trade.tradeDate,
+    ticker: trade.ticker,
+    side: trade.side,
+    session: trade.session,
+    result: trade.result,
+    rMultiple: trade.rMultiple,
+    emotions: trade.emotions || [],
+    slides: trade.slides || [],
+    templateVersion: trade.templateVersion,
+    createdAt: trade.createdAt,
+    updatedAt: trade.updatedAt,
+  }
+}
+
 export class TradeRepository {
   private db: JournalDatabase
 
@@ -63,9 +80,14 @@ export class TradeRepository {
     // Sync to Supabase if configured
     const supabase = getSupabaseClient()
     if (supabase) {
-      void supabase.from('trades').upsert(trade).then(({ error }) => {
-        if (error) console.warn('Supabase trade create sync error:', error)
-      })
+      try {
+        const { error } = await supabase.from('trades').upsert(cleanTradeForSupabase(trade))
+        if (error) {
+          console.error('Supabase trade create error:', error)
+        }
+      } catch (err) {
+        console.error('Supabase trade create exception:', err)
+      }
     }
 
     return trade
@@ -93,19 +115,67 @@ export class TradeRepository {
     // Sync to Supabase if configured
     const supabase = getSupabaseClient()
     if (supabase) {
-      void supabase.from('trades').upsert(updated).then(({ error }) => {
-        if (error) console.warn('Supabase trade update sync error:', error)
-      })
+      try {
+        const { error } = await supabase.from('trades').upsert(cleanTradeForSupabase(updated))
+        if (error) {
+          console.error('Supabase trade update error:', error)
+        }
+      } catch (err) {
+        console.error('Supabase trade update exception:', err)
+      }
     }
 
     return updated
   }
 
   async get(id: string): Promise<Trade | undefined> {
-    return this.db.trades.get(id)
+    const local = await this.db.trades.get(id)
+    if (local) {
+      return local
+    }
+
+    const supabase = getSupabaseClient()
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('trades')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle()
+
+        if (!error && data) {
+          const trade = data as Trade
+          await this.db.trades.put(trade).catch(() => {})
+          return trade
+        }
+      } catch (err) {
+        console.warn('Supabase trade get failed:', err)
+      }
+    }
+
+    return undefined
   }
 
   async listByDate(date: string): Promise<Trade[]> {
+    const supabase = getSupabaseClient()
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('trades')
+          .select('*')
+          .eq('tradeDate', date)
+          .order('createdAt', { ascending: true })
+
+        if (!error && data && Array.isArray(data)) {
+          for (const item of data) {
+            await this.db.trades.put(item as Trade).catch(() => {})
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase listByDate fetch failed:', err)
+      }
+    }
+
     return this.db.trades
       .where('tradeDate')
       .equals(date)
@@ -113,6 +183,24 @@ export class TradeRepository {
   }
 
   async listAll(): Promise<Trade[]> {
+    const supabase = getSupabaseClient()
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('trades')
+          .select('*')
+          .order('createdAt', { ascending: true })
+
+        if (!error && data && Array.isArray(data)) {
+          for (const item of data) {
+            await this.db.trades.put(item as Trade).catch(() => {})
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase listAll fetch failed:', err)
+      }
+    }
+
     return this.db.trades.toArray()
   }
 
@@ -153,17 +241,19 @@ export class TradeRepository {
     const supabase = getSupabaseClient()
     if (supabase) {
       const filePath = `${id}.png`
-      void supabase.storage
-        .from('trade-images')
-        .upload(filePath, blob, {
-          contentType: blob.type || 'image/png',
-          upsert: true,
-        })
-        .then(({ error }) => {
-          if (error) {
-            console.warn('Supabase image upload failed:', error)
-          }
-        })
+      try {
+        const { error } = await supabase.storage
+          .from('trade-images')
+          .upload(filePath, blob, {
+            contentType: blob.type || 'image/png',
+            upsert: true,
+          })
+        if (error) {
+          console.error('Supabase image upload error:', error)
+        }
+      } catch (err) {
+        console.error('Supabase image upload exception:', err)
+      }
     }
 
     return id
@@ -243,8 +333,12 @@ export class TradeRepository {
     const localTrades = await this.db.trades.toArray()
     let tradesSynced = 0
     if (localTrades.length > 0) {
-      const { error } = await supabase.from('trades').upsert(localTrades)
-      if (error) throw error
+      const cleaned = localTrades.map(cleanTradeForSupabase)
+      const { error } = await supabase.from('trades').upsert(cleaned)
+      if (error) {
+        console.error('Supabase sync trades error:', error)
+        throw error
+      }
       tradesSynced = localTrades.length
     }
 
@@ -260,6 +354,8 @@ export class TradeRepository {
         })
       if (!error) {
         imagesSynced++
+      } else {
+        console.warn(`Failed to upload image ${img.id}:`, error)
       }
     }
 

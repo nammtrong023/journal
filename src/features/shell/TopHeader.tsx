@@ -61,8 +61,17 @@ export function TopHeader({
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [cloudModalOpen, setCloudModalOpen] = useState(false)
   const [activeViewTab, setActiveViewTab] = useState<'widgets' | 'table' | 'accounts'>('widgets')
+  const [isSupabaseConnected, setIsSupabaseConnected] = useState(() => isSupabaseConfigured())
 
-  const isSupabaseConnected = isSupabaseConfigured()
+  useEffect(() => {
+    const handleConfigChange = () => setIsSupabaseConnected(isSupabaseConfigured())
+    window.addEventListener('storage', handleConfigChange)
+    window.addEventListener('supabase-config-changed', handleConfigChange)
+    return () => {
+      window.removeEventListener('storage', handleConfigChange)
+      window.removeEventListener('supabase-config-changed', handleConfigChange)
+    }
+  }, [])
 
   const filterMenuRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
