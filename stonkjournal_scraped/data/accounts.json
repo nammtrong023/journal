@@ -1,0 +1,16 @@
+[
+  {
+    "id": "0b88ff38-1b7b-40cc-9cf9-5b8eb868fe94",
+    "user_id": "c7b95294-625b-4107-b506-6ea9092d5e8f",
+    "name": "Default",
+    "broker": null,
+    "is_live": true,
+    "is_primary": true,
+    "balance": 0,
+    "created_at": "2026-11-03T17:09:15.207315+00:00",
+    "updated_at": "2026-11-03T17:09:15.207315+00:00",
+    "v1_source_id": null,
+    "deactivated_at": null,
+    "is_prop": false
+  }
+]

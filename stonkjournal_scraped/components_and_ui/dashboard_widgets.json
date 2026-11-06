@@ -1,0 +1,43 @@
+{
+  "header_actions": [
+    "Search",
+    "Account Switcher (Default)",
+    "Notifications"
+  ],
+  "date_range_presets": [
+    "30D",
+    "90D",
+    "180D",
+    "ALL"
+  ],
+  "kpi_bar": {
+    "wins": "0 (0%)",
+    "open": "1 (100%)",
+    "losses": "0 (0%)",
+    "wash": "0 (0%)",
+    "avg_win": "$0 (0%)",
+    "avg_loss": "$0 (0%)",
+    "realized_in_period": "$0.00 (0.00%)"
+  },
+  "trade_table_columns": [
+    "DATE",
+    "SYMBOL",
+    "STATUS",
+    "DIR",
+    "MARKET",
+    "QTY",
+    "ENTRY",
+    "EXIT",
+    "ENT TOT",
+    "EXT TOT",
+    "POS",
+    "HOLD",
+    "RETURN",
+    "RETURN %"
+  ],
+  "quick_actions": [
+    "New Trade",
+    "New Setup",
+    "New Note"
+  ]
+}

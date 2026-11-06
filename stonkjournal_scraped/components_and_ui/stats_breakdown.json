@@ -1,0 +1,73 @@
+{
+  "filter_presets": [
+    "1W",
+    "1M",
+    "3M",
+    "YTD",
+    "ALL"
+  ],
+  "metric_cards": [
+    {
+      "name": "P&L",
+      "formula": "Total Net Profit/Loss"
+    },
+    {
+      "name": "Win Rate",
+      "formula": "Wins / (Wins + Losses)"
+    },
+    {
+      "name": "Profit Factor",
+      "formula": "Gross Profits / Gross Losses"
+    },
+    {
+      "name": "Adj. Win/Loss Ratio",
+      "formula": "Risk-adjusted win/loss ratio"
+    },
+    {
+      "name": "Sharpe (per trade)",
+      "formula": "Mean return / standard deviation"
+    },
+    {
+      "name": "Total Trades",
+      "formula": "Count of all trades"
+    },
+    {
+      "name": "Avg Win",
+      "formula": "Total Win $ / Win Count"
+    },
+    {
+      "name": "Avg Loss",
+      "formula": "Total Loss $ / Loss Count"
+    },
+    {
+      "name": "Largest Win",
+      "formula": "Max profit single trade"
+    },
+    {
+      "name": "Largest Loss",
+      "formula": "Max loss single trade"
+    },
+    {
+      "name": "Expectancy",
+      "formula": "(Win% * Avg Win) - (Loss% * Avg Loss)"
+    },
+    {
+      "name": "Avg Win Hold",
+      "formula": "Average duration of winning trades"
+    },
+    {
+      "name": "Avg Loss Hold",
+      "formula": "Average duration of losing trades"
+    }
+  ],
+  "charts_and_sections": [
+    "Stonk Score (Proprietary trade score after 20 trades)",
+    "Rolling Win Rate (10, 20, 50, 100 trade rolling windows)",
+    "Daily Target Progress",
+    "Metric Evolution (Day, Week, Month breakdown: Win%, Profit Factor, Expectancy, etc.)",
+    "Equity Curve & Monthly Returns Calendar",
+    "ROIC (Return on Invested Capital)",
+    "Rule Compliance Impact (Adherence vs Performance correlation)",
+    "R-Multiple Performance"
+  ]
+}

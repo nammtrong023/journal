@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Futures Contract Calculator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    };
+  </script>
+  <!-- Google Fonts: DM Sans & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .font-heading {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    /* Hide number input spinners */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+  </style>
+
+  <!-- Prevent FOUC (Flash of Unstyled Content) for Dark Mode -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('calculator_theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen py-8 px-3 sm:px-6 text-slate-800 dark:text-slate-100 antialiased transition-colors duration-200">
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Top Header & Dark/Light Toggle -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+      <div>
+        <div class="flex items-center gap-2.5 mb-1">
+          <div class="p-1.5 bg-blue-600 rounded-lg text-white shadow-sm flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="4" y="2" width="16" height="20" rx="2" stroke-width="2"/>
+              <line x1="8" y1="6" x2="16" y2="6" stroke-width="2" stroke-linecap="round"/>
+              <line x1="16" y1="14" x2="16" y2="18" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight font-heading">
+            Futures Contract Calculator
+          </h1>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          Position sizing & risk calculation for Micro Futures contracts (MNQ, MES, MYM, M2K, MGC, SIL, MCL).
+        </p>
+      </div>
+
+      <!-- Theme Toggle Button (Top Right) -->
+      <div class="flex items-center self-end sm:self-center">
+        <button type="button" id="theme-toggle-btn" onclick="toggleTheme()" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 shadow-xs transition-all text-xs font-medium cursor-pointer" title="Toggle Dark/Light Mode">
+          <!-- Moon Icon (Light mode) -->
+          <svg id="theme-moon-icon" class="w-4 h-4 text-slate-600 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+          <!-- Sun Icon (Dark mode) -->
+          <svg id="theme-sun-icon" class="w-4 h-4 text-amber-400 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="5" stroke-width="2"/>
+            <path stroke-linecap="round" stroke-width="2" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <span id="theme-label" class="text-xs">Dark</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Calculator Box -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-200">
+      
+      <!-- Navigation Tabs -->
+      <div class="flex items-center justify-between border-b border-gray-200 dark:border-slate-800 px-4 pt-1 bg-white dark:bg-slate-900 transition-colors">
+        <div class="flex">
+          <button id="tab-btn-position" onclick="switchTab('position')" class="px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors border-slate-900 text-slate-900 dark:border-blue-500 dark:text-blue-400">
+            Position
+          </button>
+          <button id="tab-btn-compare" onclick="switchTab('compare')" class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
+            Compare
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-5">
+        
+        <!-- ================= TAB 1: POSITION ================= -->
+        <div id="tab-position" class="space-y-6">
+          
+          <!-- Inputs Grid: 2 Rows, 2 Columns per Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-7">
+            
+            <!-- Contract Select (Row 1, Col 1) -->
+            <div>
+              <div class="flex items-center justify-between min-h-[26px] mb-1.5">
+                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400">Contract</label>
+              </div>
+              <div class="relative">
+                <select id="pos-contract" onchange="onPositionInputChange()" class="w-full h-10 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:border-slate-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-slate-400 dark:focus:ring-blue-500/20 focus:outline-none pl-3 pr-8 transition-all cursor-pointer">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+              <div class="flex gap-1.5 mt-2.5">
+                <button type="button" onclick="setContractPreset('MNQ')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">MNQ</button>
+                <button type="button" onclick="setContractPreset('MES')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">MES</button>
+                <button type="button" onclick="setContractPreset('MYM')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">MYM</button>
+                <button type="button" onclick="setContractPreset('M2K')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">M2K</button>
+              </div>
+              <p id="crypto-notice" class="hidden mt-1 text-[10px] leading-3 text-slate-400">
+                Crypto margin figures are reference estimates and may vary by broker and market conditions.
+              </p>
+            </div>
+
+            <!-- Account Balance (Row 1, Col 2) -->
+            <div>
+              <div class="flex items-center justify-between min-h-[26px] mb-1.5">
+                <label class="block text-xs font-medium text-slate-500 dark:text-slate-400">Account</label>
+              </div>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500 text-sm">$</span>
+                <input type="number" id="pos-account" value="50000" oninput="onPositionInputChange()" class="w-full h-10 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:border-slate-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-slate-400 dark:focus:ring-blue-500/20 focus:outline-none pl-7 pr-3 transition-all">
+              </div>
+              <div class="flex gap-1.5 mt-2.5">
+                <button type="button" onclick="setAccountPreset('25000')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">25K</button>
+                <button type="button" onclick="setAccountPreset('50000')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">50K</button>
+                <button type="button" onclick="setAccountPreset('100000')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">100K</button>
+                <button type="button" onclick="setAccountPreset('150000')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">150K</button>
+              </div>
+            </div>
+
+            <!-- Stop Loss (Ticks / Points) (Row 2, Col 1) -->
+            <div>
+              <div class="flex items-center justify-between min-h-[26px] mb-1.5">
+                <label id="pos-stop-label" class="block text-xs font-medium text-slate-500 dark:text-slate-400">Stop Loss (ticks)</label>
+                <!-- Compact toggle Tick / Point -->
+                <div class="inline-flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 text-xs">
+                  <button type="button" id="pos-stop-type-ticks" onclick="setStopMode('ticks')" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-900 text-white dark:bg-blue-600 shadow-xs transition-all">Tick</button>
+                  <button type="button" id="pos-stop-type-pts" onclick="setStopMode('pts')" class="px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all">Point</button>
+                </div>
+              </div>
+              <div class="relative">
+                <input type="number" id="pos-stoploss" value="" placeholder="e.g. 40" oninput="onPositionInputChange()" class="w-full h-10 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:border-slate-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-slate-400 dark:focus:ring-blue-500/20 focus:outline-none pl-3 pr-12 transition-all">
+                <span id="pos-stoploss-suffix" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500 text-xs font-medium">ticks</span>
+              </div>
+              <!-- Presets for Ticks (Default) -->
+              <div id="pos-stop-presets-ticks" class="flex gap-1.5 mt-2.5">
+                <button type="button" onclick="setStopLossPreset('20')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">20</button>
+                <button type="button" onclick="setStopLossPreset('40')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">40</button>
+                <button type="button" onclick="setStopLossPreset('60')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">60</button>
+                <button type="button" onclick="setStopLossPreset('80')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">80</button>
+                <button type="button" onclick="setStopLossPreset('100')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">100</button>
+                <button type="button" onclick="setStopLossPreset('120')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">120</button>
+              </div>
+              <!-- Presets for Points (Hidden in Tick mode) -->
+              <div id="pos-stop-presets-pts" class="flex gap-1.5 mt-2.5 hidden">
+                <button type="button" onclick="setStopLossPreset('5')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">5</button>
+                <button type="button" onclick="setStopLossPreset('10')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">10</button>
+                <button type="button" onclick="setStopLossPreset('15')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">15</button>
+                <button type="button" onclick="setStopLossPreset('20')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">20</button>
+                <button type="button" onclick="setStopLossPreset('30')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">30</button>
+                <button type="button" onclick="setStopLossPreset('50')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">50</button>
+              </div>
+            </div>
+
+            <!-- Risk (USD / %) (Row 2, Col 2) -->
+            <div>
+              <div class="flex items-center justify-between min-h-[26px] mb-1.5">
+                <label id="pos-risk-label" class="block text-xs font-medium text-slate-500 dark:text-slate-400">Risk ($)</label>
+                <!-- Compact toggle USD / % -->
+                <div class="inline-flex p-0.5 bg-slate-100 dark:bg-slate-800 rounded-md border border-slate-200 dark:border-slate-700 text-xs">
+                  <button type="button" id="pos-risk-type-usd" onclick="setRiskType('usd')" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-900 text-white dark:bg-blue-600 shadow-xs transition-all">USD</button>
+                  <button type="button" id="pos-risk-type-pct" onclick="setRiskType('pct')" class="px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all">%</button>
+                </div>
+              </div>
+              <div class="relative">
+                <input type="number" id="pos-risk" value="200" step="10" min="150" placeholder="e.g. 200" oninput="onPositionInputChange()" class="w-full h-10 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:border-slate-400 dark:focus:border-blue-500 focus:ring-1 focus:ring-slate-400 dark:focus:ring-blue-500/20 focus:outline-none pl-3 pr-11 transition-all">
+                <span id="pos-risk-suffix" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500 text-xs font-medium">USD</span>
+              </div>
+              <!-- Presets for USD (Default) -->
+              <div id="pos-risk-presets-usd" class="flex gap-1.5 mt-2.5">
+                <button type="button" onclick="setRiskPreset('150')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">$150</button>
+                <button type="button" onclick="setRiskPreset('200')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">$200</button>
+                <button type="button" onclick="setRiskPreset('250')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">$250</button>
+                <button type="button" onclick="setRiskPreset('300')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">$300</button>
+              </div>
+              <!-- Presets for % (Hidden in USD mode) -->
+              <div id="pos-risk-presets-pct" class="flex gap-1.5 mt-2.5 hidden">
+                <button type="button" onclick="setRiskPreset('0.5')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">0.5%</button>
+                <button type="button" onclick="setRiskPreset('1')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">1%</button>
+                <button type="button" onclick="setRiskPreset('1.5')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">1.5%</button>
+                <button type="button" onclick="setRiskPreset('2')" class="flex-1 px-1 py-1 text-[10px] font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded transition-colors">2%</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Key Result Cards Box -->
+          <div class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/60 dark:to-slate-900/60 rounded-xl p-3 border border-slate-200 dark:border-slate-800 space-y-3">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+              
+              <!-- Contracts -->
+              <div class="bg-white dark:bg-slate-800 rounded-lg p-3 border-l-4 border-slate-900 dark:border-blue-500 shadow-sm dark:shadow-none flex flex-col justify-between">
+                <div>
+                  <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-0.5">Contracts</p>
+                  <p id="res-contracts" class="text-2xl font-bold text-slate-900 dark:text-white font-heading">0</p>
+                </div>
+                <p id="res-contract-name" class="text-[11px] text-slate-400 dark:text-slate-500 mt-1 truncate">Micro Nasdaq-100</p>
+              </div>
+
+              <!-- Risk Target -->
+              <div class="bg-white dark:bg-slate-800 rounded-lg p-3 border-l-4 border-red-500 shadow-sm dark:shadow-none flex flex-col justify-between">
+                <div>
+                  <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-0.5">Risk Target</p>
+                  <p id="res-risk-amount" class="text-2xl font-bold text-slate-900 dark:text-white font-heading">$200</p>
+                </div>
+                <p id="res-risk-per-contract" class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">$0.00/contract</p>
+              </div>
+
+              <!-- Dollar Risk -->
+              <div class="bg-white dark:bg-slate-800 rounded-lg p-3 border-l-4 border-blue-500 shadow-sm dark:shadow-none flex flex-col justify-between">
+                <div>
+                  <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-0.5">Dollar Risk</p>
+                  <p id="res-dollar-risk" class="text-2xl font-bold text-slate-900 dark:text-white font-heading">$0.00</p>
+                </div>
+                <p id="res-risk-percent" class="text-[11px] text-slate-400 dark:text-slate-500 mt-1">0.00% of account</p>
+              </div>
+
+              <!-- Risk Level Badge -->
+              <div id="res-risk-card" class="rounded-lg p-3 border shadow-sm bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/60 flex flex-col justify-between transition-colors">
+                <div>
+                  <p class="text-[11px] font-medium mb-0.5 opacity-75">Risk Level</p>
+                  <p id="res-risk-level" class="text-xl font-bold font-heading">Conservative</p>
+                </div>
+                <div class="flex items-center gap-1.5 mt-1">
+                  <svg class="w-3.5 h-3.5 opacity-75 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  <p id="res-risk-badge-sub" class="text-[11px] opacity-80">Account risk</p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Risk as % of Account Bar -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <p class="text-xs font-medium text-slate-600 dark:text-slate-300">Risk as % of Account</p>
+                <p id="res-bar-label" class="text-xs font-semibold text-slate-700 dark:text-slate-200">0.00%</p>
+              </div>
+              <div class="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div id="res-bar-fill" class="h-full transition-all duration-500 bg-emerald-500 rounded-full" style="width: 0%;"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Profit Targets Section -->
+          <div class="bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div class="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950/40 dark:to-green-950/30 px-3 py-2 border-b border-gray-200 dark:border-slate-800 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                <circle cx="12" cy="12" r="6" stroke-width="2"/>
+                <circle cx="12" cy="12" r="2" stroke-width="2"/>
+              </svg>
+              <h3 class="text-xs font-semibold text-slate-700 dark:text-emerald-300">Profit Targets (Risk:Reward)</h3>
+            </div>
+            <div class="p-3">
+              <div class="grid grid-cols-3 gap-2.5">
+                
+                <!-- 1:1 Target -->
+                <div class="text-center bg-emerald-50/80 dark:bg-emerald-950/30 rounded-lg p-2.5 border border-emerald-200/80 dark:border-emerald-900/50">
+                  <p class="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 mb-0.5">1:1 Target</p>
+                  <p id="res-target-1" class="text-lg font-bold text-emerald-900 dark:text-emerald-200 font-heading">$200</p>
+                  <p id="res-target-pts-1" class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">0 points</p>
+                </div>
+
+                <!-- 1:2 Target -->
+                <div class="text-center bg-emerald-50/80 dark:bg-emerald-950/30 rounded-lg p-2.5 border border-emerald-200/80 dark:border-emerald-900/50">
+                  <p class="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 mb-0.5">1:2 Target</p>
+                  <p id="res-target-2" class="text-lg font-bold text-emerald-900 dark:text-emerald-200 font-heading">$400</p>
+                  <p id="res-target-pts-2" class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">0 points</p>
+                </div>
+
+                <!-- 1:3 Target -->
+                <div class="text-center bg-emerald-50/80 dark:bg-emerald-950/30 rounded-lg p-2.5 border border-emerald-200/80 dark:border-emerald-900/50">
+                  <p class="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 mb-0.5">1:3 Target</p>
+                  <p id="res-target-3" class="text-lg font-bold text-emerald-900 dark:text-emerald-200 font-heading">$600</p>
+                  <p id="res-target-pts-3" class="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5">0 points</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Summary Mini Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div class="bg-white dark:bg-slate-800/80 rounded-lg border border-gray-200 dark:border-slate-800 p-2.5 shadow-sm">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5 font-medium">Cost Per Point</p>
+              <p id="res-cost-point" class="text-base font-semibold text-slate-900 dark:text-white font-heading">$0.00</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800/80 rounded-lg border border-gray-200 dark:border-slate-800 p-2.5 shadow-sm">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5 font-medium">Tick Value</p>
+              <p id="res-tick-val" class="text-base font-semibold text-slate-900 dark:text-white font-heading">$0.50</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800/80 rounded-lg border border-gray-200 dark:border-slate-800 p-2.5 shadow-sm">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5 font-medium">Remaining Balance</p>
+              <p id="res-remaining" class="text-base font-semibold text-slate-900 dark:text-white font-heading">$50,000</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800/80 rounded-lg border border-gray-200 dark:border-slate-800 p-2.5 shadow-sm">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5 font-medium">Max Drawdown</p>
+              <p id="res-drawdown" class="text-base font-semibold text-red-600 dark:text-red-400 font-heading">$200</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ================= TAB 2: COMPARE ================= -->
+        <div id="tab-compare" class="hidden space-y-3">
+          <div class="flex items-center justify-between pb-1">
+            <p class="text-xs text-slate-500 dark:text-slate-400">Thông số 7 hợp đồng Micro: Lot size (Point value), Tick size, Tick value và Reference margin.</p>
+            <input type="text" id="compare-search" oninput="filterCompareTable()" placeholder="Search contracts..." class="text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-slate-400 dark:focus:border-blue-500">
+          </div>
+          <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-slate-800">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead class="bg-slate-50 dark:bg-slate-800/80 border-b border-gray-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-medium">
+                <tr>
+                  <th class="px-3 py-2.5">Symbol</th>
+                  <th class="px-3 py-2.5">Tên</th>
+                  <th class="px-3 py-2.5">Lot size</th>
+                  <th class="px-3 py-2.5">Tick size</th>
+                  <th class="px-3 py-2.5">Tick value</th>
+                  <th class="px-3 py-2.5">Margin</th>
+                  <th class="px-3 py-2.5">$/Point</th>
+                </tr>
+              </thead>
+              <tbody id="compare-tbody" class="divide-y divide-gray-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- 1. CONTRACT SPECIFICATIONS DATABASE ---
+    const CONTRACTS = {
+      // Stock Indices (Micro)
+      "MNQ": { symbol: "MNQ", name: "MNQ - Micro Nasdaq-100", fullName: "Micro Nasdaq-100", group: "Stock Indices", lotSize: 2, tickSize: 0.25, tickValue: 0.50, margin: 1760 },
+      "MES": { symbol: "MES", name: "MES - Micro S&P 500", fullName: "Micro S&P 500", group: "Stock Indices", lotSize: 5, tickSize: 0.25, tickValue: 1.25, margin: 1540 },
+      "MYM": { symbol: "MYM", name: "MYM - Micro Dow", fullName: "Micro Dow", group: "Stock Indices", lotSize: 0.5, tickSize: 1.0, tickValue: 0.50, margin: 1265 },
+      "M2K": { symbol: "M2K", name: "M2K - Micro Russell 2000", fullName: "Micro Russell 2000", group: "Stock Indices", lotSize: 5, tickSize: 0.1, tickValue: 0.50, margin: 660 },
+
+      // Metals (Micro)
+      "MGC": { symbol: "MGC", name: "MGC - Micro Gold", fullName: "Micro Gold", group: "Metals", lotSize: 10, tickSize: 0.10, tickValue: 1.00, margin: 1100 },
+      "SIL": { symbol: "SIL", name: "SIL - Micro Silver", fullName: "Micro Silver", group: "Metals", lotSize: 1000, tickSize: 0.005, tickValue: 5.00, margin: 1540 },
+
+      // Energy (Micro CL)
+      "MCL": { symbol: "MCL", name: "MCL - Micro Crude Oil", fullName: "Micro Crude Oil", group: "Energy", lotSize: 100, tickSize: 0.01, tickValue: 1.00, margin: 660 }
+    };
+
+    const ALIASES = {
+      "NQ-Micro": "MNQ",
+      "ES-Micro": "MES",
+      "YM-Micro": "MYM",
+      "RTY-Micro": "M2K",
+      "GC-Micro": "MGC",
+      "CL-Micro": "MCL",
+      "SI-Micro": "SIL"
+    };
+
+    function getContract(key) {
+      if (CONTRACTS[key]) return CONTRACTS[key];
+      if (ALIASES[key] && CONTRACTS[ALIASES[key]]) return CONTRACTS[ALIASES[key]];
+      return CONTRACTS["MNQ"];
+    }
+
+    // --- 2. THEME MANAGEMENT (DARK / LIGHT) ---
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('calculator_theme', isDark ? 'dark' : 'light');
+      updateThemeUI(isDark);
+    }
+
+    function updateThemeUI(isDark) {
+      const sun = document.getElementById('theme-sun-icon');
+      const moon = document.getElementById('theme-moon-icon');
+      const label = document.getElementById('theme-label');
+      if (label) {
+        label.textContent = isDark ? 'Light' : 'Dark';
+      }
+      // Re-apply tab border styles
+      switchTab(activeTab);
+      // Re-apply risk type active button styles
+      setRiskType(currentRiskType, false);
+      // Re-apply stop mode active button styles
+      setStopMode(currentStopMode, false);
+    }
+
+    // --- 3. TAB MANAGEMENT ---
+    let activeTab = 'position';
+    function switchTab(tab) {
+      activeTab = tab;
+      const isDark = document.documentElement.classList.contains('dark');
+      ['position', 'compare'].forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const pane = document.getElementById(`tab-${t}`);
+        if (!btn || !pane) return;
+        if (t === tab) {
+          btn.className = isDark
+            ? "px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors border-blue-500 text-blue-400"
+            : "px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors border-slate-900 text-slate-900";
+          pane.classList.remove('hidden');
+        } else {
+          btn.className = isDark
+            ? "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors border-transparent text-slate-400 hover:text-slate-200"
+            : "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors border-transparent text-slate-500 hover:text-slate-700";
+          pane.classList.add('hidden');
+        }
+      });
+    }
+
+    // --- 4. POPULATE DROPDOWNS & TABLE ---
+    function populateDropdowns() {
+      const posSelect = document.getElementById('pos-contract');
+      
+      const groups = {};
+      Object.entries(CONTRACTS).forEach(([key, spec]) => {
+        if (!groups[spec.group]) groups[spec.group] = [];
+        groups[spec.group].push({ key, ...spec });
+      });
+
+      let posHtml = '';
+      for (const [groupName, items] of Object.entries(groups)) {
+        posHtml += `<optgroup label="${groupName}">`;
+        items.forEach(item => {
+          posHtml += `<option value="${item.key}">${item.name}</option>`;
+        });
+        posHtml += `</optgroup>`;
+      }
+
+      posSelect.innerHTML = posHtml;
+      posSelect.value = "MNQ";
+    }
+
+    function populateCompareTable() {
+      const tbody = document.getElementById('compare-tbody');
+      let html = '';
+      Object.entries(CONTRACTS).forEach(([key, spec]) => {
+        html += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" data-search="${spec.symbol.toLowerCase()} ${spec.fullName.toLowerCase()}">
+            <td class="px-3 py-2.5 font-bold text-slate-900 dark:text-white font-mono">${spec.symbol}</td>
+            <td class="px-3 py-2.5 font-medium text-slate-800 dark:text-slate-200">${spec.fullName}</td>
+            <td class="px-3 py-2.5 text-blue-600 dark:text-blue-400 font-bold font-mono">${spec.lotSize}</td>
+            <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 font-mono">${spec.tickSize}</td>
+            <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 font-mono">$${spec.tickValue.toFixed(2)}</td>
+            <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 font-mono font-medium">$${spec.margin.toLocaleString()}</td>
+            <td class="px-3 py-2.5 text-slate-600 dark:text-slate-400 font-mono">$${spec.lotSize}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function filterCompareTable() {
+      const query = document.getElementById('compare-search').value.toLowerCase().trim();
+      const rows = document.querySelectorAll('#compare-tbody tr');
+      rows.forEach(row => {
+        const text = row.getAttribute('data-search');
+        if (text.includes(query)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    // --- 5. POSITION TAB CALCULATOR ENGINE ---
+    let currentStopMode = 'ticks'; // Default is ticks as requested
+    let currentRiskType = 'usd';   // Default is USD as requested
+
+    function setStopMode(mode, triggerCalc = true) {
+      currentStopMode = mode;
+      const isDark = document.documentElement.classList.contains('dark');
+      const btnTicks = document.getElementById('pos-stop-type-ticks');
+      const btnPts = document.getElementById('pos-stop-type-pts');
+      const label = document.getElementById('pos-stop-label');
+      const suffix = document.getElementById('pos-stoploss-suffix');
+      const input = document.getElementById('pos-stoploss');
+      const presetsTicks = document.getElementById('pos-stop-presets-ticks');
+      const presetsPts = document.getElementById('pos-stop-presets-pts');
+      const contract = document.getElementById('pos-contract').value;
+      const spec = getContract(contract);
+      const currentVal = parseFloat(input.value) || 0;
+
+      if (mode === 'ticks') {
+        if (btnTicks) {
+          btnTicks.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-600 text-white shadow-xs transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-900 text-white shadow-xs transition-all";
+        }
+        if (btnPts) {
+          btnPts.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-medium text-slate-400 hover:text-slate-200 transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 hover:text-slate-800 transition-all";
+        }
+        if (label) label.textContent = "Stop Loss (ticks)";
+        if (suffix) suffix.textContent = "ticks";
+        if (input) {
+          input.step = "1";
+          input.placeholder = "e.g. 40";
+          // Convert from points to ticks
+          if (triggerCalc && currentVal > 0) {
+            const convertedTicks = Math.round(currentVal / spec.tickSize);
+            input.value = convertedTicks > 0 ? convertedTicks : "";
+          }
+        }
+        if (presetsTicks) presetsTicks.classList.remove('hidden');
+        if (presetsPts) presetsPts.classList.add('hidden');
+      } else {
+        if (btnPts) {
+          btnPts.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-600 text-white shadow-xs transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-900 text-white shadow-xs transition-all";
+        }
+        if (btnTicks) {
+          btnTicks.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-medium text-slate-400 hover:text-slate-200 transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 hover:text-slate-800 transition-all";
+        }
+        if (label) label.textContent = "Stop Loss (pts)";
+        if (suffix) suffix.textContent = "pts";
+        if (input) {
+          input.step = spec.tickSize.toString();
+          input.placeholder = "e.g. 10";
+          // Convert from ticks to points
+          if (triggerCalc && currentVal > 0) {
+            const convertedPts = parseFloat((currentVal * spec.tickSize).toFixed(4));
+            input.value = convertedPts > 0 ? convertedPts : "";
+          }
+        }
+        if (presetsTicks) presetsTicks.classList.add('hidden');
+        if (presetsPts) presetsPts.classList.remove('hidden');
+      }
+
+      if (triggerCalc) {
+        onPositionInputChange();
+      }
+    }
+
+    function setRiskType(type, triggerCalc = true) {
+      currentRiskType = type;
+      const isDark = document.documentElement.classList.contains('dark');
+      const btnUsd = document.getElementById('pos-risk-type-usd');
+      const btnPct = document.getElementById('pos-risk-type-pct');
+      const label = document.getElementById('pos-risk-label');
+      const suffix = document.getElementById('pos-risk-suffix');
+      const input = document.getElementById('pos-risk');
+      const presetsUsd = document.getElementById('pos-risk-presets-usd');
+      const presetsPct = document.getElementById('pos-risk-presets-pct');
+      const account = parseFloat(document.getElementById('pos-account').value) || 0;
+      const currentVal = parseFloat(input.value) || 0;
+
+      if (type === 'usd') {
+        if (btnUsd) {
+          btnUsd.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-600 text-white shadow-xs transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-900 text-white shadow-xs transition-all";
+        }
+        if (btnPct) {
+          btnPct.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-medium text-slate-400 hover:text-slate-200 transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 hover:text-slate-800 transition-all";
+        }
+        if (label) label.textContent = "Risk ($)";
+        if (suffix) suffix.textContent = "USD";
+        if (input) {
+          input.step = "10";
+          input.min = "150";
+          input.removeAttribute('max');
+          input.placeholder = "e.g. 200";
+          if (triggerCalc && currentVal > 0) {
+            if (currentVal <= 100 && account > 0) {
+              const convertedUsd = Math.round((account * (currentVal / 100)) * 100) / 100;
+              input.value = convertedUsd || 200;
+            } else {
+              input.value = currentVal || 200;
+            }
+          } else if (!input.value) {
+            input.value = "200";
+          }
+        }
+        if (presetsUsd) presetsUsd.classList.remove('hidden');
+        if (presetsPct) presetsPct.classList.add('hidden');
+      } else {
+        if (btnPct) {
+          btnPct.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-600 text-white shadow-xs transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-900 text-white shadow-xs transition-all";
+        }
+        if (btnUsd) {
+          btnUsd.className = isDark
+            ? "px-2 py-0.5 rounded text-[11px] font-medium text-slate-400 hover:text-slate-200 transition-all"
+            : "px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 hover:text-slate-800 transition-all";
+        }
+        if (label) label.textContent = "Risk (%)";
+        if (suffix) suffix.textContent = "%";
+        if (input) {
+          input.step = "0.1";
+          input.min = "0.1";
+          input.max = "100";
+          input.placeholder = "e.g. 1";
+          if (triggerCalc && currentVal > 0) {
+            if (account > 0) {
+              const convertedPct = Math.round((currentVal / account * 100) * 10) / 10;
+              input.value = convertedPct > 0 ? convertedPct : 1;
+            } else {
+              input.value = "1";
+            }
+          } else if (!input.value) {
+            input.value = "1";
+          }
+        }
+        if (presetsUsd) presetsUsd.classList.add('hidden');
+        if (presetsPct) presetsPct.classList.remove('hidden');
+      }
+
+      if (triggerCalc) {
+        onPositionInputChange();
+      }
+    }
+
+    function onPositionInputChange() {
+      const contract = document.getElementById('pos-contract').value;
+      const account = parseFloat(document.getElementById('pos-account').value) || 0;
+      const stopVal = parseFloat(document.getElementById('pos-stoploss').value) || 0;
+      const riskVal = parseFloat(document.getElementById('pos-risk').value) || 0;
+
+      const specs = getContract(contract);
+
+      // Stop distance in points & ticks
+      let stopPts = 0;
+      let stopTicks = 0;
+      if (stopVal > 0) {
+        if (currentStopMode === 'ticks') {
+          stopTicks = Math.round(stopVal);
+          stopPts = stopTicks * specs.tickSize;
+        } else {
+          stopPts = stopVal;
+          stopTicks = Math.round(stopVal / specs.tickSize);
+        }
+      }
+
+      // Risk Amount
+      let riskAmount = 0;
+      let effectiveRiskPct = 0;
+
+      if (currentRiskType === 'usd') {
+        riskAmount = riskVal;
+        effectiveRiskPct = account > 0 ? (riskAmount / account * 100) : 0;
+      } else {
+        effectiveRiskPct = riskVal;
+        riskAmount = account * (effectiveRiskPct / 100);
+      }
+
+      const pointVal = specs.lotSize;
+      const dollarRiskPerContract = stopPts * pointVal;
+      const rawContracts = dollarRiskPerContract > 0 && riskAmount > 0 ? (riskAmount / dollarRiskPerContract) : 0;
+      const maxContracts = Math.floor(rawContracts);
+      const actualRisk = maxContracts * dollarRiskPerContract;
+      const actualPct = account > 0 ? (actualRisk / account * 100) : 0;
+
+      const fmtCur = (n) => '$' + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      // UI outputs
+      document.getElementById('res-contracts').textContent = maxContracts;
+      document.getElementById('res-contract-name').textContent = maxContracts > 0
+        ? `Rounded down from ${rawContracts.toFixed(2)}`
+        : (dollarRiskPerContract > 0 ? 'Risk too tight — stop exceeds budget' : specs.fullName);
+      document.getElementById('res-risk-amount').textContent = `$${riskAmount.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+      document.getElementById('res-risk-per-contract').textContent = `$${dollarRiskPerContract.toFixed(2)}/contract`;
+      
+      const elDollarRisk = document.getElementById('res-dollar-risk') || document.getElementById('res-margin');
+      if (elDollarRisk) elDollarRisk.textContent = fmtCur(actualRisk);
+      const elRiskPct = document.getElementById('res-risk-percent') || document.getElementById('res-margin-percent');
+      if (elRiskPct) elRiskPct.textContent = `${actualPct.toFixed(2)}% of account`;
+
+      // Risk Level Badge & Risk as % of Account Bar
+      const riskCard = document.getElementById('res-risk-card');
+      const riskLevel = document.getElementById('res-risk-level');
+      const barFill = document.getElementById('res-bar-fill');
+      const barLabel = document.getElementById('res-bar-label');
+
+      const barW = Math.min((actualPct / 5) * 100, 100);
+      barLabel.textContent = `${actualPct.toFixed(2)}%`;
+      barFill.style.width = `${barW}%`;
+
+      if (actualPct > 3) {
+        riskLevel.textContent = "High Risk";
+        riskCard.className = "rounded-lg p-3 border shadow-sm bg-red-100 text-red-800 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60 flex flex-col justify-between transition-colors";
+        barFill.className = "h-full transition-all duration-500 bg-red-500 rounded-full";
+      } else if (actualPct > 1.5) {
+        riskLevel.textContent = "Moderate Risk";
+        riskCard.className = "rounded-lg p-3 border shadow-sm bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/60 flex flex-col justify-between transition-colors";
+        barFill.className = "h-full transition-all duration-500 bg-amber-500 rounded-full";
+      } else {
+        riskLevel.textContent = "Conservative";
+        riskCard.className = "rounded-lg p-3 border shadow-sm bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/60 flex flex-col justify-between transition-colors";
+        barFill.className = "h-full transition-all duration-500 bg-emerald-500 rounded-full";
+      }
+
+      // Profit Targets
+      const ptsDisplay = (stopPts > 0) ? (Number.isInteger(stopPts) ? stopPts : parseFloat(stopPts.toFixed(4))) : 0;
+      const pts2Display = (stopPts > 0) ? (Number.isInteger(stopPts * 2) ? (stopPts * 2) : parseFloat((stopPts * 2).toFixed(4))) : 0;
+      const pts3Display = (stopPts > 0) ? (Number.isInteger(stopPts * 3) ? (stopPts * 3) : parseFloat((stopPts * 3).toFixed(4))) : 0;
+
+      document.getElementById('res-target-1').textContent = fmtCur(actualRisk);
+      document.getElementById('res-target-pts-1').textContent = `${ptsDisplay} pts (${stopTicks} ticks)`;
+
+      document.getElementById('res-target-2').textContent = fmtCur(actualRisk * 2);
+      document.getElementById('res-target-pts-2').textContent = `${pts2Display} pts (${stopTicks * 2} ticks)`;
+
+      document.getElementById('res-target-3').textContent = fmtCur(actualRisk * 3);
+      document.getElementById('res-target-pts-3').textContent = `${pts3Display} pts (${stopTicks * 3} ticks)`;
+
+      // Summary Cards
+      const costPerPoint = pointVal * maxContracts;
+      document.getElementById('res-cost-point').textContent = `$${costPerPoint.toFixed(2)}`;
+      document.getElementById('res-tick-val').textContent = `$${specs.tickValue.toFixed(2)}`;
+      document.getElementById('res-remaining').textContent = `$${Math.max(account - actualRisk, 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      document.getElementById('res-drawdown').textContent = fmtCur(actualRisk);
+
+      // Save to localStorage
+      try {
+        localStorage.setItem("calculator-settings", JSON.stringify({
+          contract,
+          accountBalance: account.toString(),
+          stopLoss: stopVal.toString(),
+          stopMode: currentStopMode,
+          riskType: currentRiskType,
+          riskValue: riskVal.toString(),
+          riskPercentage: effectiveRiskPct.toString()
+        }));
+      } catch (e) {}
+    }
+
+    function setContractPreset(val) {
+      document.getElementById('pos-contract').value = val;
+      onPositionInputChange();
+    }
+
+    function setAccountPreset(val) {
+      document.getElementById('pos-account').value = val;
+      onPositionInputChange();
+    }
+
+    function setStopLossPreset(val) {
+      document.getElementById('pos-stoploss').value = val;
+      onPositionInputChange();
+    }
+
+    function setRiskPreset(val) {
+      document.getElementById('pos-risk').value = val;
+      onPositionInputChange();
+    }
+
+    // --- 6. INITIALIZATION ---
+    window.addEventListener('DOMContentLoaded', () => {
+      populateDropdowns();
+      populateCompareTable();
+
+      const isDark = document.documentElement.classList.contains('dark');
+      updateThemeUI(isDark);
+
+      // Load saved settings if any
+      try {
+        const saved = localStorage.getItem("calculator-settings");
+        if (saved) {
+          const cfg = JSON.parse(saved);
+          const cSym = cfg.contract && (CONTRACTS[cfg.contract] ? cfg.contract : (ALIASES[cfg.contract] || "MNQ"));
+          document.getElementById('pos-contract').value = cSym;
+          document.getElementById('pos-account').value = cfg.accountBalance || "50000";
+          
+          if (cfg.stopMode === 'pts') {
+            setStopMode('pts', false);
+          } else {
+            setStopMode('ticks', false);
+          }
+          document.getElementById('pos-stoploss').value = (cfg.stopLoss && cfg.stopLoss !== "10" && cfg.stopLoss !== "0") ? cfg.stopLoss : "";
+
+          if (cfg.riskType === 'pct') {
+            setRiskType('pct', false);
+            if (cfg.riskValue) document.getElementById('pos-risk').value = cfg.riskValue;
+            else if (cfg.riskPercentage) document.getElementById('pos-risk').value = cfg.riskPercentage;
+          } else {
+            setRiskType('usd', false);
+            if (cfg.riskValue && cfg.riskType === 'usd') {
+              document.getElementById('pos-risk').value = cfg.riskValue;
+            } else {
+              document.getElementById('pos-risk').value = "200";
+            }
+          }
+        } else {
+          document.getElementById('pos-account').value = "50000";
+          setStopMode('ticks', false);
+          document.getElementById('pos-stoploss').value = "";
+          setRiskType('usd', false);
+          document.getElementById('pos-risk').value = "200";
+        }
+      } catch (e) {
+        document.getElementById('pos-account').value = "50000";
+        setStopMode('ticks', false);
+        document.getElementById('pos-stoploss').value = "";
+        setRiskType('usd', false);
+        document.getElementById('pos-risk').value = "200";
+      }
+
+      const hash = window.location.hash.replace('#', '');
+      if (['position', 'compare'].includes(hash)) {
+        switchTab(hash);
+      } else {
+        switchTab('position');
+      }
+
+      onPositionInputChange();
+    });
+  </script>
+</body>
+</html>

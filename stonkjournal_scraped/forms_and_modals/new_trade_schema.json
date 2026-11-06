@@ -1,0 +1,572 @@
+[
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-popover-trigger-v-1-616",
+    "placeholder": "",
+    "label": "",
+    "text": "Templates",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "General",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Journal",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Dividends",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Adjustments",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "STOCK",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "text",
+    "name": "",
+    "id": "",
+    "placeholder": "AAPL",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "LONG",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "$",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "%",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "number",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "$",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "%",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "number",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "\u00d7",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "BUY",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "text",
+    "name": "",
+    "id": "",
+    "placeholder": "YYYY-MM-DD hh:mm:ss AM",
+    "label": "",
+    "text": "",
+    "value": "2026-11-04 12:58:00 AM"
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-popover-trigger-v-1-618",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "number",
+    "name": "",
+    "id": "",
+    "placeholder": "Qty",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "number",
+    "name": "",
+    "id": "",
+    "placeholder": "Price",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "number",
+    "name": "",
+    "id": "",
+    "placeholder": "Fee",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "+",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Select...",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Select...",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "Click to pick a tag or type to add...",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Chased entry",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Moved stop",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Over-sized",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "No plan",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Early exit",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Late exit",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Wrong direction",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Ignored signal",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "file",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-dropdown-menu-trigger-v-1-625",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-dropdown-menu-trigger-v-1-627",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-dropdown-menu-trigger-v-1-636",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "range",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "range",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "file",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Add dividend",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Add adjustment",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Cancel",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Check compliance",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Save",
+    "value": ""
+  }
+]

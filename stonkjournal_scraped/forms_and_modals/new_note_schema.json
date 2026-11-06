@@ -1,0 +1,302 @@
+[
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "text",
+    "name": "",
+    "id": "",
+    "placeholder": "YYYY-MM-DD",
+    "label": "",
+    "text": "",
+    "value": "2026-11-04"
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-popover-trigger-v-1-701",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "textarea",
+    "type": "",
+    "name": "",
+    "id": "",
+    "placeholder": "Brief summary of the day",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "input",
+    "type": "file",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-dropdown-menu-trigger-v-1-705",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-dropdown-menu-trigger-v-1-707",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "reka-dropdown-menu-trigger-v-1-716",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Cancel",
+    "value": ""
+  },
+  {
+    "tag": "button",
+    "type": "button",
+    "name": "",
+    "id": "",
+    "placeholder": "",
+    "label": "",
+    "text": "Save",
+    "value": ""
+  }
+]
