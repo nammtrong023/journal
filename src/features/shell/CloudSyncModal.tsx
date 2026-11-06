@@ -69,6 +69,8 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
         setAnonKey(config.anonKey)
         setConnected(true)
       } else {
+        setUrl('https://zcmknxpffyrhwmiioboy.supabase.co')
+        setAnonKey('')
         setConnected(false)
       }
       setMessage(null)
@@ -103,6 +105,7 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
       }
       setConnected(true)
       setMessage({ type: 'success', text: 'Connected to Supabase successfully!' })
+      window.dispatchEvent(new Event('trades-changed'))
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err)
       setMessage({
@@ -132,6 +135,7 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
         type: 'success',
         text: `Synced ${res.tradesSynced} trades and ${res.imagesSynced} images to Supabase!`,
       })
+      window.dispatchEvent(new Event('trades-changed'))
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err)
       setMessage({ type: 'error', text: `Sync failed: ${errMsg}` })
@@ -149,6 +153,7 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
         type: 'success',
         text: `Restored ${res.pulledTrades} trades from Supabase into this device!`,
       })
+      window.dispatchEvent(new Event('trades-changed'))
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err)
       setMessage({ type: 'error', text: `Restore failed: ${errMsg}` })
@@ -169,7 +174,17 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-border/80">
           <div className="flex items-center gap-2.5">
-            <div className={`p-2 rounded-lg ${connected ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-text-muted'}`}>
+            <div
+              style={
+                connected
+                  ? {
+                      backgroundColor: 'rgba(74, 222, 128, 0.15)',
+                      color: '#4ade80',
+                    }
+                  : undefined
+              }
+              className="p-2 rounded-lg bg-white/5 text-text-muted"
+            >
               <Cloud size={20} />
             </div>
             <div>
@@ -189,9 +204,18 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
         {/* Status indicator */}
         <div className="mt-4 flex items-center justify-between p-3 rounded-lg bg-bg-main border border-border/70 text-xs">
           <div className="flex items-center gap-2">
-            <span className={`w-2.5 h-2.5 rounded-full ${connected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-            <span className="font-medium text-text-strong">
-              {connected ? 'Supabase Connected' : 'Local Storage Only (Browser DB)'}
+            <span
+              style={{
+                backgroundColor: connected ? '#4ade80' : '#facc15',
+                boxShadow: connected ? '0 0 8px rgba(74, 222, 128, 0.7)' : '0 0 6px rgba(250, 204, 21, 0.5)',
+              }}
+              className="w-2.5 h-2.5 rounded-full inline-block"
+            />
+            <span
+              style={{ color: connected ? '#4ade80' : 'var(--text-strong)' }}
+              className="font-medium"
+            >
+              {connected ? 'Supabase Connected (Live Cloud)' : 'Local Storage Only (Browser DB)'}
             </span>
           </div>
           <a
@@ -208,11 +232,20 @@ export function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps) {
         {/* Feedback Alert */}
         {message && (
           <div
-            className={`mt-3 p-3 rounded-lg text-xs flex items-start gap-2 ${
+            style={
               message.type === 'success'
-                ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
-                : 'bg-rose-500/10 border border-rose-500/30 text-rose-300'
-            }`}
+                ? {
+                    backgroundColor: 'rgba(74, 222, 128, 0.12)',
+                    borderColor: 'rgba(74, 222, 128, 0.35)',
+                    color: '#86efac',
+                  }
+                : {
+                    backgroundColor: 'rgba(248, 113, 113, 0.12)',
+                    borderColor: 'rgba(248, 113, 113, 0.35)',
+                    color: '#fca5a5',
+                  }
+            }
+            className="mt-3 p-3 rounded-lg border text-xs flex items-start gap-2"
           >
             <AlertCircle size={15} className="shrink-0 mt-0.5" />
             <span>{message.text}</span>

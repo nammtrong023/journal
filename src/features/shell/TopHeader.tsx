@@ -237,15 +237,26 @@ export function TopHeader({
         <button
           type="button"
           onClick={() => setCloudModalOpen(true)}
-          className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer ${
+          style={
             isSupabaseConnected
-              ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30'
-              : 'text-text-muted hover:text-text-strong hover:bg-white/[0.05]'
-          }`}
+              ? {
+                  color: '#4ade80',
+                  backgroundColor: 'rgba(74, 222, 128, 0.15)',
+                  borderColor: 'rgba(74, 222, 128, 0.4)',
+                }
+              : undefined
+          }
+          className="relative flex items-center justify-center w-8 h-8 rounded-md border border-transparent text-text-muted hover:text-text-strong hover:bg-white/[0.05] transition-colors cursor-pointer"
           title={isSupabaseConnected ? 'Cloud Sync Active (Supabase)' : 'Cloud Sync (Configure Supabase)'}
           aria-label="Cloud Sync"
         >
           <Cloud size={16} />
+          {isSupabaseConnected && (
+            <span
+              style={{ backgroundColor: '#4ade80', boxShadow: '0 0 6px #4ade80' }}
+              className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full inline-block"
+            />
+          )}
         </button>
 
         {/* Theme Icon */}
@@ -313,7 +324,7 @@ export function TopHeader({
                   }}
                   className="flex items-center gap-2.5 px-3.5 py-2 text-text-main hover:text-text-strong hover:bg-white/[0.05] transition-colors w-full text-left cursor-pointer"
                 >
-                  <Cloud size={14} className={isSupabaseConnected ? 'text-emerald-400' : 'text-accent-blue'} />
+                  <Cloud size={14} style={{ color: isSupabaseConnected ? '#4ade80' : 'var(--accent-blue)' }} />
                   <span>Cloud Database & Sync</span>
                 </button>
               </div>

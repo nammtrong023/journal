@@ -32,6 +32,13 @@ export function CalendarPage({
 
   useEffect(() => {
     loadAllTrades()
+    const handleTradesChanged = () => {
+      loadAllTrades()
+    }
+    window.addEventListener('trades-changed', handleTradesChanged)
+    return () => {
+      window.removeEventListener('trades-changed', handleTradesChanged)
+    }
   }, [loadAllTrades])
 
   const handleDateSelect = async (date: string) => {

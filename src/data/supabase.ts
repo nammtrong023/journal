@@ -21,11 +21,14 @@ export function getSupabaseConfig(): SupabaseConfig | null {
   const envUrl =
     metaEnv?.VITE_SUPABASE_URL ||
     metaEnv?.SUPABASE_URL ||
-    metaEnv?.NEXT_PUBLIC_SUPABASE_URL
+    metaEnv?.NEXT_PUBLIC_SUPABASE_URL ||
+    'https://zcmknxpffyrhwmiioboy.supabase.co'
   const envKey =
     metaEnv?.VITE_SUPABASE_ANON_KEY ||
     metaEnv?.SUPABASE_ANON_KEY ||
-    metaEnv?.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    metaEnv?.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    metaEnv?.SUPABASE_PUBLISHABLE_KEY ||
+    metaEnv?.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
   if (envUrl && envKey) {
     return { url: envUrl.trim(), anonKey: envKey.trim() }
@@ -34,7 +37,7 @@ export function getSupabaseConfig(): SupabaseConfig | null {
   // 2. Try browser localStorage (configured directly through the UI modal)
   if (typeof window !== 'undefined' && window.localStorage) {
     try {
-      const localUrl = localStorage.getItem(SUPABASE_STORAGE_URL_KEY)
+      const localUrl = localStorage.getItem(SUPABASE_STORAGE_URL_KEY) || envUrl
       const localKey = localStorage.getItem(SUPABASE_STORAGE_ANON_KEY)
       if (localUrl && localKey) {
         return { url: localUrl.trim(), anonKey: localKey.trim() }
