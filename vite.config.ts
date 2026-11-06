@@ -11,6 +11,7 @@ export default defineConfig({
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-db': ['dexie'],
+          'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-date': ['date-fns'],
           'vendor-icons': ['lucide-react'],
         },

@@ -12,8 +12,11 @@ import {
   Check,
   Sliders,
   TrendingUp,
+  Cloud,
 } from 'lucide-react'
 import type { TradeRepository } from '../../data/trade-repository'
+import { isSupabaseConfigured } from '../../data/supabase'
+import { CloudSyncModal } from './CloudSyncModal'
 
 export function StonkLogo({ className = 'w-5 h-6' }: { className?: string }) {
   return (
@@ -56,7 +59,10 @@ export function TopHeader({
   const [activeFilter, setActiveFilter] = useState('All Trades')
   const [filterMenuOpen, setFilterMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [cloudModalOpen, setCloudModalOpen] = useState(false)
   const [activeViewTab, setActiveViewTab] = useState<'widgets' | 'table' | 'accounts'>('widgets')
+
+  const isSupabaseConnected = isSupabaseConfigured()
 
   const filterMenuRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -218,6 +224,21 @@ export function TopHeader({
           {privacyMode ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
 
+        {/* Cloud Sync (Supabase) */}
+        <button
+          type="button"
+          onClick={() => setCloudModalOpen(true)}
+          className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors cursor-pointer ${
+            isSupabaseConnected
+              ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/30'
+              : 'text-text-muted hover:text-text-strong hover:bg-white/[0.05]'
+          }`}
+          title={isSupabaseConnected ? 'Cloud Sync Active (Supabase)' : 'Cloud Sync (Configure Supabase)'}
+          aria-label="Cloud Sync"
+        >
+          <Cloud size={16} />
+        </button>
+
         {/* Theme Icon */}
         <button
           type="button"
@@ -275,6 +296,17 @@ export function TopHeader({
                   <Sliders size={14} className="text-accent-green" />
                   <span>Futures Calculator</span>
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUserMenuOpen(false)
+                    setCloudModalOpen(true)
+                  }}
+                  className="flex items-center gap-2.5 px-3.5 py-2 text-text-main hover:text-text-strong hover:bg-white/[0.05] transition-colors w-full text-left cursor-pointer"
+                >
+                  <Cloud size={14} className={isSupabaseConnected ? 'text-emerald-400' : 'text-accent-blue'} />
+                  <span>Cloud Database & Sync</span>
+                </button>
               </div>
 
               <div className="border-t border-border/60 pt-1">
@@ -287,6 +319,8 @@ export function TopHeader({
           )}
         </div>
       </div>
+
+      <CloudSyncModal isOpen={cloudModalOpen} onClose={() => setCloudModalOpen(false)} />
     </header>
   )
 }
