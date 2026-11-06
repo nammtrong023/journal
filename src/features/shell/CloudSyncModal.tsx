@@ -30,7 +30,6 @@ create table if not exists trades (
   ticker text,
   side text,
   session text,
-  "volatilityDriver" text,
   result numeric,
   "rMultiple" numeric,
   emotions jsonb,

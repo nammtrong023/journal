@@ -106,12 +106,6 @@ export function TradeRecapRow({ trade, repository }: TradeRecapRowProps) {
             </span>
           )}
 
-          {trade.volatilityDriver && (
-            <span className="driver-tag text-[11px] font-medium px-2 py-0.5 rounded bg-accent-blue/10 text-accent-blue border border-accent-blue/25">
-              {trade.volatilityDriver}
-            </span>
-          )}
-
           {trade.emotions && trade.emotions.length > 0 && (
             <div className="flex flex-wrap items-center gap-1">
               {trade.emotions.map((id) => {

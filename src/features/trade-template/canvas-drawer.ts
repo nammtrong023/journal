@@ -4,7 +4,6 @@ export interface SlideDrawConfig {
   ticker: string
   side: 'Long' | 'Short' | ''
   session: string
-  volatilityDriver: string
   result?: number
   rMultiple?: number
   handle?: string
@@ -235,7 +234,7 @@ export function drawSlideToCanvas(
   let subBase = 0
   let titleBase = 0
 
-  const subText = slide.subtitle || (slide.key === 'context' && trade.volatilityDriver ? trade.volatilityDriver : '')
+  const subText = slide.subtitle || ''
   if (subText) {
     subBase = y
     y = subBase - ss - 16 * s

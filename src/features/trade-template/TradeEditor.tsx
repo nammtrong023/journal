@@ -56,7 +56,6 @@ export function TradeEditor({ tradeId: propTradeId, repository = defaultReposito
   const [ticker, setTicker] = useState<string>('')
   const [side, setSide] = useState<'Long' | 'Short' | ''>('Long')
   const [session, setSession] = useState<string>('New York AM')
-  const [volatilityDriver, setVolatilityDriver] = useState<string>('')
   const [result, setResult] = useState<string>('')
   const [rMultiple, setRMultiple] = useState<string>('')
   const [emotions, setEmotions] = useState<string[]>([])
@@ -77,7 +76,6 @@ export function TradeEditor({ tradeId: propTradeId, repository = defaultReposito
           setTicker(trade.ticker)
           setSide(trade.side)
           setSession(trade.session || '')
-          setVolatilityDriver(trade.volatilityDriver || '')
           setResult(trade.result !== undefined ? String(trade.result) : '')
           setRMultiple(trade.rMultiple !== undefined ? String(trade.rMultiple) : '')
           if (trade.emotions) {
@@ -150,7 +148,6 @@ export function TradeEditor({ tradeId: propTradeId, repository = defaultReposito
           ticker: ticker.toUpperCase(),
           side,
           session,
-          volatilityDriver,
           result: numResult,
           rMultiple: numRMultiple,
           emotions,
@@ -163,7 +160,6 @@ export function TradeEditor({ tradeId: propTradeId, repository = defaultReposito
           ticker: ticker.toUpperCase(),
           side,
           session,
-          volatilityDriver,
           result: numResult,
           rMultiple: numRMultiple,
           emotions,
@@ -434,7 +430,6 @@ export function TradeEditor({ tradeId: propTradeId, repository = defaultReposito
                 ticker,
                 side,
                 session,
-                volatilityDriver,
                 result: result.trim() === '' ? undefined : Number(result),
                 rMultiple: rMultiple.trim() === '' ? undefined : Number(rMultiple),
               }}

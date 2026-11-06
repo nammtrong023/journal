@@ -50,7 +50,6 @@ export class TradeRepository {
       ticker: input.ticker || '',
       side: input.side || '',
       session: input.session || '',
-      volatilityDriver: input.volatilityDriver || '',
       result: input.result,
       rMultiple: input.rMultiple,
       emotions: input.emotions,

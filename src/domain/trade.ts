@@ -20,7 +20,6 @@ export interface Trade {
   ticker: string
   side: 'Long' | 'Short' | ''
   session: string
-  volatilityDriver: string
   result?: number
   rMultiple?: number
   emotions?: string[]
@@ -36,7 +35,6 @@ export type NewTrade = {
   ticker: string
   side?: 'Long' | 'Short' | ''
   session?: string
-  volatilityDriver?: string
   result?: number
   rMultiple?: number
   emotions?: string[]

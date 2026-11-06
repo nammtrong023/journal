@@ -11,7 +11,6 @@ const makeTrade = (id: string, result: number, rMultiple: number, ticker = 'MNQ'
   ticker,
   side: 'Long',
   session: 'New York AM',
-  volatilityDriver: '',
   result,
   rMultiple,
   slides: [],

@@ -14,7 +14,6 @@ describe('DayDashboardPage', () => {
     ticker: 'NQ',
     side: 'Long',
     session: 'NY AM',
-    volatilityDriver: '',
     result: 250,
     rMultiple: 2,
     slides: [
@@ -31,7 +30,6 @@ describe('DayDashboardPage', () => {
     ticker: 'NQ',
     side: 'Short',
     session: 'NY PM',
-    volatilityDriver: '',
     result: -100,
     rMultiple: -1,
     slides: [

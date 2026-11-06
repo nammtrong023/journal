@@ -10,7 +10,6 @@ function makeMockTrade(result: number | undefined, emotions: string[]): Trade {
     ticker: 'NQ',
     side: 'Long',
     session: 'NY AM',
-    volatilityDriver: '',
     result,
     emotions,
     slides: [],

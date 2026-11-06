@@ -12,7 +12,6 @@ function trade(overrides: Partial<Trade>): Trade {
     ticker: 'MNQ',
     side: 'Long',
     session: 'New York AM',
-    volatilityDriver: '',
     slides: [],
     createdAt: '2026-11-04T09:00:00.000Z',
     updatedAt: '2026-11-04T09:00:00.000Z',

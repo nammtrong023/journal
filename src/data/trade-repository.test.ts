@@ -29,7 +29,6 @@ describe('TradeRepository', () => {
       ticker: 'ES',
       side: 'Long',
       session: 'NY AM',
-      volatilityDriver: 'CPI',
       result: 500,
       rMultiple: 2.5,
       slides: [],
